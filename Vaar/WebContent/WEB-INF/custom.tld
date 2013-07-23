@@ -1,0 +1,17 @@
+
+<taglib>
+	<tlib-version>1.0</tlib-version>
+	<jsp-version>2.0</jsp-version>
+	<short-name>Example TLD</short-name>
+
+	<tag>
+		<name>MySearch</name>
+		<tag-class>com.webonise.vaar.view.VaarSearchTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>definition</name>
+			<required>true</required>
+		</attribute>
+	</tag>
+
+</taglib>

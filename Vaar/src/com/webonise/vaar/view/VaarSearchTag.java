@@ -7,12 +7,15 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 
+
 import com.webonise.vaar.utility.AnnotationResolver;
 
 /**
  * @author Anvay Rajhansa This class is to manage the custom tag MySearch
  * 
  */
+
+//@ContextConfiguration(locations = {"/WEB-INF/vaar-context.xml"})
 public class VaarSearchTag extends BodyTagSupport {
 
 	/**
@@ -22,12 +25,16 @@ public class VaarSearchTag extends BodyTagSupport {
 
 	private String definition;
 
-	private AnnotationResolver myannotationResolved = new AnnotationResolver();
+	//@Autowired(required=true)
+	private  AnnotationResolver annotationResolver= new AnnotationResolver();
 
+	
 	/**
 	 * @return the definition
 	 */
-	public String getDefinition() {
+	public String getDefinition() 
+	{
+		
 		return definition;
 	}
 
@@ -46,13 +53,17 @@ public class VaarSearchTag extends BodyTagSupport {
 	 */
 	public int doStartTag() throws JspException {
 
+		
+		
 		JspWriter out = pageContext.getOut();
-		Field[] fields = myannotationResolved.getFields(definition);
+		Field[] fields = annotationResolver.getFields(definition);
 
 		try {
 			if (fields == null)
 				out.println("No attributes !!!");
 			else {
+				out.println("<form action=\"VaarControllerServlet?def=defination\" method=\"GET\">");
+				out.println("<input type=\"hidden\" name=\"defination\" value=\""+definition+"\">");
 				out.println("<div style=\"border:2px solid black; float:left; margin:0px 20px 0px 0px; padding:5px \">");
 				out.print("<table border=\"2px solid black\">");
 				for (Field field : fields) {
@@ -71,7 +82,7 @@ public class VaarSearchTag extends BodyTagSupport {
 							out.println("<label>" + field.getName()
 									+ "</label> </td><td>");
 
-							out.println("<input type=\"text\" value=\"\"> </br>");
+							out.println("<input type=\"text\" name=\""+field.getName()+"\"\"> </br>");
 							out.print("</td>");
 							out.print("</tr>");
 						}
@@ -84,7 +95,7 @@ public class VaarSearchTag extends BodyTagSupport {
 				out.print("</tr>");
 				out.print("</table>");
 				out.println("</div>");
-
+                out.println("</form>");
 				out.println("<div style=\"border:2px solid black; float:left; padding:5px;\">");
 				out.print("<table>");
 				out.print("<tr>");
@@ -124,5 +135,14 @@ public class VaarSearchTag extends BodyTagSupport {
 
 		return SKIP_PAGE;
 	}
+
+	public AnnotationResolver getAnnotationResolver() {
+		return annotationResolver;
+	}
+
+	public void setAnnotationResolver(AnnotationResolver annotationResolver) {
+		this.annotationResolver = annotationResolver;
+	}
+
 
 }

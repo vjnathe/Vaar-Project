@@ -3,6 +3,7 @@ package com.webonise.vaar.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -10,7 +11,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.JOptionPane;
+import com.webonise.vaar.service.VaarService;
+import com.webonise.vaar.service.VaarServiceImpl;
+import com.webonise.vaar.user.Employee;
 
 /**
  * Servlet implementation class VaarControllerServlet
@@ -34,13 +37,13 @@ public class VaarControllerServlet extends HttpServlet {
      Enumeration<?> param=request.getParameterNames();
      String classpath=null;
      List<String> parameters=new ArrayList<String>();
+     List list;
      while(param.hasMoreElements())
      {
     	 String paramName = (String)param.nextElement();
     	 if(paramName.equals("defination"))
     	 {
     		 classpath=request.getParameter(paramName);
-    	 JOptionPane.showMessageDialog(null, classpath);
     	 }
     	 else
     	 {
@@ -55,8 +58,9 @@ public class VaarControllerServlet extends HttpServlet {
     	 }
     	 
      }
-     //VaarServiceImpl service=new VaarService();
-     //service.search(parameters,classpath);
+     VaarService service=new VaarServiceImpl();
+     list=service.search(parameters,classpath);
+    
 }
 
 	/**

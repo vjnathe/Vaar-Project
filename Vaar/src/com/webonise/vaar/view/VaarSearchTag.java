@@ -1,12 +1,10 @@
 package com.webonise.vaar.view;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
+import javax.servlet.ServletException;
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.BodyTagSupport;
-
+import javax.swing.JOptionPane;
 
 import com.webonise.vaar.utility.AnnotationResolver;
 
@@ -15,7 +13,7 @@ import com.webonise.vaar.utility.AnnotationResolver;
  * 
  */
 
-//@ContextConfiguration(locations = {"/WEB-INF/vaar-context.xml"})
+// @ContextConfiguration(locations = {"/WEB-INF/vaar-context.xml"})
 public class VaarSearchTag extends BodyTagSupport {
 
 	/**
@@ -25,16 +23,14 @@ public class VaarSearchTag extends BodyTagSupport {
 
 	private String definition;
 
-	//@Autowired(required=true)
-	private  AnnotationResolver annotationResolver= new AnnotationResolver();
+	// @Autowired(required=true)
+	private AnnotationResolver annotationResolver = new AnnotationResolver();
 
-	
 	/**
 	 * @return the definition
 	 */
-	public String getDefinition() 
-	{
-		
+	public String getDefinition() {
+
 		return definition;
 	}
 
@@ -52,77 +48,15 @@ public class VaarSearchTag extends BodyTagSupport {
 	 * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
 	 */
 	public int doStartTag() throws JspException {
-
-		
-		
-		JspWriter out = pageContext.getOut();
-		Field[] fields = annotationResolver.getFields(definition);
+		JOptionPane.showMessageDialog(null, definition);
 
 		try {
-			if (fields == null)
-				out.println("No attributes !!!");
-			else {
-				out.println("<form action=\"VaarControllerServlet?def=defination\" method=\"GET\">");
-				out.println("<input type=\"hidden\" name=\"defination\" value=\""+definition+"\">");
-				out.println("<div style=\"border:2px solid black; float:left; margin:0px 20px 0px 0px; padding:5px \">");
-				out.print("<table border=\"2px solid black\">");
-				for (Field field : fields) {
-
-					Annotation an[] = field.getAnnotations();
-					if (an.length == 0)
-						System.out.println("No Annotations !!!");
-
-					for (Annotation annotation : an) {
-
-						if (annotation
-								.toString()
-								.equals("@com.webonise.vaar.annotationinterface.SearchColumn()")) {
-							out.print("<tr>");
-							out.print("<td>");
-							out.println("<label>" + field.getName()
-									+ "</label> </td><td>");
-
-							out.println("<input type=\"text\" name=\""+field.getName()+"\"\"> </br>");
-							out.print("</td>");
-							out.print("</tr>");
-						}
-					}
-				}
-				out.print("<tr>");
-				out.print("<td colspan=\"2\" align=\"center\">");
-				out.println("<input type=\"submit\" value=\"Search\">");
-				out.print("</td>");
-				out.print("</tr>");
-				out.print("</table>");
-				out.println("</div>");
-                out.println("</form>");
-				out.println("<div style=\"border:2px solid black; float:left; padding:5px;\">");
-				out.print("<table>");
-				out.print("<tr>");
-				for (Field field1 : fields) {
-					Annotation an1[] = field1.getAnnotations();
-					for (Annotation annotation : an1) {
-						if (annotation
-								.toString()
-								.equals("@com.webonise.vaar.annotationinterface.GridColumn()")) {
-							out.print("<td>");
-							out.println("<label>" + field1.getName()
-									+ "</label>");
-							out.println("<input type=\"text\" value=\"\"> </br>");
-							out.print("</td>");
-						}
-					}
-				}
-				out.print("</tr>");
-				out.print("</table>");
-				out.println("</div>");
-			}
-
-		} catch (IOException e) {
-
+			   pageContext.forward("SearchTool.jsp?definition="+definition+"");
+		} catch (ServletException | IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-
 		}
+		
 		return SKIP_BODY;
 	}
 
@@ -143,6 +77,5 @@ public class VaarSearchTag extends BodyTagSupport {
 	public void setAnnotationResolver(AnnotationResolver annotationResolver) {
 		this.annotationResolver = annotationResolver;
 	}
-
 
 }

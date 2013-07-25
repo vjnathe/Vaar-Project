@@ -25,7 +25,7 @@ public class VaarServiceHelper {
 							.equals("@com.webonise.vaar.annotationinterface.GridColumn()")){
 						query=query+field.getName();
 						
-						if(j!=(fields.length-2))
+						if((j+1)<(fields.length))
 						query=query+",";
 					}
 				}

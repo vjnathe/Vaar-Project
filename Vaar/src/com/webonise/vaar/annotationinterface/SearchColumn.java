@@ -14,4 +14,7 @@ import java.lang.annotation.Target;
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface SearchColumn {
 
+	String label();
+	String type() default "String";
+
 }

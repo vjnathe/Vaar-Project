@@ -3,7 +3,6 @@ package com.webonise.vaar.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -13,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.webonise.vaar.service.VaarService;
 import com.webonise.vaar.service.VaarServiceImpl;
-import com.webonise.vaar.user.Employee;
 
 /**
  * Servlet implementation class VaarControllerServlet
@@ -41,7 +39,7 @@ public class VaarControllerServlet extends HttpServlet {
      while(param.hasMoreElements())
      {
     	 String paramName = (String)param.nextElement();
-    	 if(paramName.equals("defination"))
+    	 if(paramName.equals("definition"))
     	 {
     		 classpath=request.getParameter(paramName);
     	 }

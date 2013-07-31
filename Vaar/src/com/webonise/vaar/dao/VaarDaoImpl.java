@@ -1,35 +1,25 @@
 package com.webonise.vaar.dao;
 
 import java.util.List;
-
-import org.hibernate.Query;
-import org.hibernate.Session;
+import javax.swing.JOptionPane;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class VaarDaoImpl implements VaarDao{
-	
-	private static SessionFactory factory;
-	private static Session session = null;
-	      
+public class VaarDaoImpl implements VaarDao {
+
+	@Autowired
+	SessionFactory sessionfactory;
+
 	@Override
-	public List search(String query) {
-	
-		try {
-			Configuration cfg = new Configuration().configure();
-			factory = cfg.buildSessionFactory();
-		} catch (Throwable ex) {
-			System.err.println("Failed to create sessionFactory object."
-					+ ex);
-			throw new ExceptionInInitializerError(ex);
-		}
-		session = factory.openSession();
-		Transaction transaction = session.beginTransaction();
-		Query finalQuery = session.createQuery(query);
-		List<?> list = finalQuery.list();
-		transaction.commit();
-		
+	public List<?> search(String query) {
+
+		System.out.println("\n\nDAO : In the search function.");
+		List<?> list = sessionfactory.getCurrentSession().createQuery(query)
+				.list();
+
+		if (list.size() == 0)
+			JOptionPane.showMessageDialog(null, "No Records Found !!!");
+
 		return list;
 	}
 }

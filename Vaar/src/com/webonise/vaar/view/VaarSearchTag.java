@@ -48,7 +48,6 @@ public class VaarSearchTag extends BodyTagSupport {
 	 * @see javax.servlet.jsp.tagext.BodyTagSupport#doStartTag()
 	 */
 	public int doStartTag() throws JspException {
-		JOptionPane.showMessageDialog(null, definition);
 
 		try {
 			   pageContext.forward("SearchTool.jsp?definition="+definition+"");

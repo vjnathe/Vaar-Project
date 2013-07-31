@@ -6,25 +6,36 @@
 		import="com.webonise.vaar.annotationinterface.SearchColumn"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+	<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
+</script>
 <script>
 function validate()
 {
 	var ele=document.getElementById('searchdiv').getElementsByTagName('input');
-	for(var i=0;i<ele.length;i++)
+	var len=ele.length;
+	var count=0;
+	if(len==0)
+	return false;
+	for(var j=0;j<len;j++)
 	{
-		 if(ele[i].value=="")
-		 {
-			   ele[i].focus();
-			   alert("Field Required");
-			   return false;
-		  }
+		if((ele[j].value=="")==true)
+			count=count+1;		
+	}
+	if(count>=len)
+	{
+		alert("Atlease one field Required");
+		return false;
+	}
+   for(var i=0;i<len;i++)
+	{
 		 var type=ele[i].getAttribute('datatype');
 		 if(type=="String" || type=="Long" || type=="Date")
 			 {
-			   if(type=="String")
+			   if(type=="String" && ele[i].value!="")
 				   {
 				     var val=ele[i].value;
 				     if(val.startsWith("'") && val.endsWith("'") && val.length>2)
@@ -37,7 +48,7 @@ function validate()
 				    	   return false;
 				    	 }
 				   }
-			   if(type=="Long")
+			   if(type=="Long" && ele[i].value!="")
 				   {
 				     var letters = /^[0-9]+$/;
 				     if(!ele[i].value.match(letters))
@@ -48,7 +59,7 @@ function validate()
 					     return false;
 					   }
 				   }
-			   if(type=="Date")
+			   if(type=="Date" && ele[i].value!="")
 				   {
 				      var matches = /^(\d{2})[-\/](\d{2})[-\/](\d{4})$/.exec(ele[i].value);
 				      
@@ -82,77 +93,147 @@ function validate()
 	}
 	return true;
 }
+
+function search()
+{
+	if(!validate())
+	return true;
+	document.getElementById("table").innerHTML="";
+	var param="";
+	var ele=document.getElementById('searchdiv').getElementsByTagName('input');
+	param+='definition';
+	param+=",";
+	param+=document.getElementById('def').value;
+	for ( var i = 0; i < ele.length; i++) {
+		param+=",";
+		param+=ele[i].getAttribute('name');
+		param+=",";
+		if(ele[i].value!="")
+			param+=ele[i].value;
+		else
+			param+="?";
+	}
+	//var myList=
+		$.ajax({
+		type: "GET",
+		url: "fetcher.html",
+		async: false,
+		data:{parameters:param},
+		//dataType:"json",
+		success:function(myList) {
+			var json = JSON.parse(myList);
+			buildTable(json);
+		    },
+		    failure:function (error) {
+                alert('error; ' + eval(error));
+            }
+		}); 		
+		
+}
+
+function makeColumns(myList)
+{
+	 var columns=new Array();
+	 for(var i=0;i<myList.length;i++)
+		 {
+		   for(var key  in myList[i])
+		   {
+			     if(notExist(columns,key))
+                  columns.push(key); 
+		   } 
+		 }
+  return columns;	
+}
+
+function notExist(columns,key)
+{
+	 for ( var i = 0; i < columns.length; i++) {
+		if(columns[i]==key)
+			return false;
+	}
+	 return true;
+}
+
+function buildTable(myList)
+{
+	 var columns=makeColumns(myList);
+	 var table="<table border=\"2px\">";
+	 table+="<tr>";
+	 for(var i=0;i<columns.length;i++)
+		table+="<td>"+columns[i]+"</td>";
+		table+="</tr>";
+	 for(var i=0;i<myList.length;i++)
+	 {
+		 table+="<tr>";
+	   for(var key  in myList[i])
+	   {
+		   table+="<td>"+myList[i][key]+"</td>";
+	    }
+	   table+="</tr>";
+	 }
+	 table+="</table>"
+		document.getElementById("table").innerHTML=table;
+}
 </script>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Search Tool</title>
 </head>
-<body>
+<body onload="buildTable()">
 
 	<% 
 		
 		AnnotationResolver ann=new AnnotationResolver();
 		String definition=request.getParameter("definition");
-		JOptionPane.showMessageDialog(null,definition);
 		Field[] fields=ann.getFields(definition);
-		if(fields == null){
-			out.println("No attributes !!!");
-		}
-		else{
-	%>
-
-	<form action="VaarControllerServlet?def="<%=definition%>" method="GET">
-		<input type="hidden" name="defination" value=definition>
-			<div id="searchdiv" style="border: 2px solid black; float: left; margin: 0px 20px 0px 0px; padding: 5px">
-				<table border="2px solid black">
-					<% for(Field field : fields) {
-							Annotation an[] = field.getAnnotations();
-							if (an.length == 0)
-								System.out.println("No Annotations !!!");
-
-							for (Annotation annotation : an) {
-								if (annotation
+		pageContext.setAttribute("fields", fields);
+		%>
+		<div style="border: 2px solid black;float:left;">
+		<c:choose>
+		<c:when test="${fields == null }">
+			<% System.out.println("No attributes !!!");%>
+		</c:when>
+		
+		<c:when test="${fields != null }">
+			<input id="def" type="hidden" name="definition" value=<%=definition%>>
+			
+				<div id="searchdiv" style="float: left; margin: 50px 50px;">
+					<table border="2px solid black">
+					<c:forEach var="field" items="${fields}" >
+						<% 
+								Field field=(Field)pageContext.getAttribute("field");
+								Annotation an[] = field.getAnnotations();
+								int length=an.length;
+								pageContext.setAttribute("length", length);
+								pageContext.setAttribute("an", an);
+						%>
+						<c:if test="${length == 0 }">
+							<% System.out.println("No Annotations !!!");%>
+						</c:if>
+						<c:forEach var="annotation" items="${an}">
+							<c:if test="${annotation
 									.toString()
-									.startsWith("@com.webonise.vaar.annotationinterface.SearchColumn")) {
-									SearchColumn column=field.getAnnotation(SearchColumn.class); %>
-
-							<tr>
-								<td><label><%=column.label()%></label></td>
-								<td><input datatype=<%=column.type()%> type="text" name=<%=field.getName()%>></td>
-							</tr>
-							<%		
-								}
-							}
-						} %>
-						
-							<tr>
-								<td colspan="2" align="center"> <button onclick="return validate()">Search</button> 
-								</td>
-							</tr>
+									.startsWith(\"@com.webonise.vaar.annotationinterface.SearchColumn\")}">
+								
+									<% SearchColumn column=field.getAnnotation(SearchColumn.class); 
+										pageContext.setAttribute("column", column);%>
+								<tr>
+									<td><label><%=column.label()%></label></td> 
+									<td><input datatype=<%=column.type()%> type="text" name=<%=field.getName()%>></td>
+								</tr>
+							</c:if>
+						</c:forEach>
+					</c:forEach>	
+					<tr>
+						<td colspan="2" align="center"> <button onclick="return search()">Search</button>
+						</td>
+					</tr>
 
 				</table>
 			</div>
-	</form>
-
-	<div style="border:2pxsolidblack; float:left; padding:5px;">
-		<table>
-			<tr>
-				<% for (Field field1 : fields) { 
-					Annotation an1[] = field1.getAnnotations();
-					for (Annotation annotation : an1) {
-						if(annotation 
-							.toString()
-							.equals("@com.webonise.vaar.annotationinterface.GridColumn()")) {
-				%>
-				<td><label>field1.getName()</label> <input type="text" value="">
-				</td>
-				<%
-						}
-					}
-				}
-		}
-				%>
-			</tr>
-		</table>
+		</c:when>
+	</c:choose>
+	<div id="table" style="float: left;margin:50px 50px;">	
+	</div>
 	</div>
 </body>
 </html>

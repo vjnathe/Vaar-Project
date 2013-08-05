@@ -12,6 +12,8 @@
 <head>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
 </script>
+<script type="text/javascript" src="validation.js">
+</script>
 <script>
 function validate()
 {
@@ -44,7 +46,7 @@ function validate()
 				    	 {
 				    	   alert('Invalid String');
 				    	   ele[i].focus();
-				    	   ele[i].value=""
+				    	   ele[i].value="";
 				    	   return false;
 				    	 }
 				   }
@@ -178,7 +180,7 @@ function buildTable(myList)
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Search Tool</title>
 </head>
-<body onload="buildTable()">
+<body>
 
 	<% 
 		
@@ -186,6 +188,7 @@ function buildTable(myList)
 		String definition=request.getParameter("definition");
 		Field[] fields=ann.getFields(definition);
 		pageContext.setAttribute("fields", fields);
+		pageContext.setAttribute("definition", definition);
 		%>
 		<div style="border: 2px solid black;float:left;">
 		<c:choose>
@@ -194,7 +197,7 @@ function buildTable(myList)
 		</c:when>
 		
 		<c:when test="${fields != null }">
-			<input id="def" type="hidden" name="definition" value=<%=definition%>>
+			<input id="def" type="hidden" name="definition" value="${definition}">
 			
 				<div id="searchdiv" style="float: left; margin: 50px 50px;">
 					<table border="2px solid black">
@@ -217,8 +220,8 @@ function buildTable(myList)
 									<% SearchColumn column=field.getAnnotation(SearchColumn.class); 
 										pageContext.setAttribute("column", column);%>
 								<tr>
-									<td><label><%=column.label()%></label></td> 
-									<td><input datatype=<%=column.type()%> type="text" name=<%=field.getName()%>></td>
+									<td><label>${column.label()}</label></td> 
+									<td><input datatype="${column.type()}" type="text" name="${field.getName()}"></td>
 								</tr>
 							</c:if>
 						</c:forEach>

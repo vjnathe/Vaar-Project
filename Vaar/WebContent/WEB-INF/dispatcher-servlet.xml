@@ -14,9 +14,6 @@
  <context:component-scan base-package="com.webonise.vaar"/>
 
 
-
-
-
 <bean id="vaarServiceHelper" class="com.webonise.vaar.service.VaarServiceHelper">
 </bean>
 
@@ -31,16 +28,15 @@
 
 <bean id="jacksonMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
 
-<context:property-placeholder location="classpath:jdbc.properties" />
 
 	<tx:annotation-driven transaction-manager="hibernateTransactionManager" />
 
 	
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="${database.driver}" />
-		<property name="url" value="${database.url}" />
-		<property name="username" value="${database.user}" />
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/test_java" />
+		<property name="username" value="webonise" />
 		
 	</bean>
 
@@ -49,13 +45,13 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="annotatedClasses">
 			<list>
-				<value>${database.package}</value>
+				<value>com.webonise.vaar.user.Employee</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
 			<props>
-				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
-				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
 			</props>
 		</property>
 	</bean>
